@@ -35,4 +35,12 @@ CookieManager.getAll((err, res) => {
   console.log(err);
   console.log(res);
 });
+
+// clear cookies
+CookieManager.clearAll((err, res) => {
+  console.log('cookies cleared!');
+  console.log(err);
+  console.log(res);
+});
+
 ```
