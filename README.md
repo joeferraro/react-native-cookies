@@ -44,3 +44,12 @@ CookieManager.clearAll((err, res) => {
 });
 
 ```
+
+### Roadmap
+
+- Expose `get` method
+- Proper `getAll` dictionary by domain
+- Proper error handling
+- Anything else?
+
+PR's welcome!
