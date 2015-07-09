@@ -1,6 +1,6 @@
 {
   "name": "react-native-cookies",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Cookie manager for react native",
   "main": "index.js",
   "author": "@joeferraro",
