@@ -6,13 +6,13 @@
 RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(set:(NSDictionary *)props callback:(RCTResponseSenderBlock)callback) {
-	NSString *name = [RCTConvert NSString:props[@"name"]];
-	NSString *value = [RCTConvert NSString:props[@"value"]];
-	NSString *domain = [RCTConvert NSString:props[@"domain"]];
-	NSString *origin = [RCTConvert NSString:props[@"origin"]];
-	NSString *path = [RCTConvert NSString:props[@"path"]];
-	NSString *version = [RCTConvert NSString:props[@"version"]];
-	NSDate *expiration = [RCTConvert NSDate:props[@"expiration"]];
+    NSString *name = [RCTConvert NSString:props[@"name"]];
+    NSString *value = [RCTConvert NSString:props[@"value"]];
+    NSString *domain = [RCTConvert NSString:props[@"domain"]];
+    NSString *origin = [RCTConvert NSString:props[@"origin"]];
+    NSString *path = [RCTConvert NSString:props[@"path"]];
+    NSString *version = [RCTConvert NSString:props[@"version"]];
+    NSDate *expiration = [RCTConvert NSDate:props[@"expiration"]];
 
     NSMutableDictionary *cookieProperties = [NSMutableDictionary dictionary];
     [cookieProperties setObject:name forKey:NSHTTPCookieName];
@@ -40,7 +40,7 @@ RCT_EXPORT_METHOD(set:(NSDictionary *)props callback:(RCTResponseSenderBlock)cal
 RCT_EXPORT_METHOD(clearAll:(RCTResponseSenderBlock)callback) {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     for (NSHTTPCookie *c in cookieStorage.cookies) {
-    	[cookieStorage deleteCookie:c];
+        [cookieStorage deleteCookie:c];
     }
     callback(@[[NSNull null], @"success"]);
 }

@@ -4,5 +4,8 @@
   "description": "Cookie manager for react native",
   "main": "index.js",
   "author": "@joeferraro",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "invariant": "^2.1.0"
+  }
 }
