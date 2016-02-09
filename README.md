@@ -4,18 +4,24 @@ Cookie manager for react native.
 
 ### Installation
 
+#### IOS
 1. `npm install react-native-cookies`
 2. In the XCode's "Project navigator", right click on project name folder ➜ `Add Files to <...>`
  - Ensure `Copy items if needed` and `Create groups` are checked
 3. Go to `node_modules` ➜ `react-native-cookies` ➜ add `RNCookieManagerIOS` folder
 4. Compile and have some cookies
 
+#### android
+1. `npm install react-native-cookies`
+2. `rnpm link react-native-cookies` - (run `npm install -g rnpm` if required)
+3. Om nom nom nom cookies.
+
 ### Usage
 
 ```javascript
 var CookieManager = require('react-native-cookies');
 
-// set a cookie
+// set a cookie (IOS ONLY)
 CookieManager.set({
   name: 'myCookie',
   value: 'myValue',
@@ -30,7 +36,21 @@ CookieManager.set({
   console.log(res);
 });
 
-// list cookies
+// Set cookies from a response header
+// This allows you to put the full string provided by a server's Set-Cookie 
+// response header directly into the cookie store.
+CookieManager.setFromResponse('http://example.com', 'user_session=abcdefg; path=/; expires=Thu, 1 Jan 2030 00:00:00 -0000; secure; HttpOnly', (res) => {
+  // `res` will be true or false depending on success.
+  console.log("Set cookie", res);
+})
+
+// Get cookies as a request header string
+CookieManager.get('http://example.com', (res) => {
+  console.log('Got cookies for url', res);
+  // Outputs 'user_session=abcdefg; path=/;'
+})
+
+// list cookies (IOS ONLY)
 CookieManager.getAll((err, res) => {
   console.log('cookies!');
   console.log(err);
@@ -48,7 +68,6 @@ CookieManager.clearAll((err, res) => {
 
 ### Roadmap
 
-- Expose `get` method
 - Proper `getAll` dictionary by domain
 - Proper error handling
 - Anything else?
