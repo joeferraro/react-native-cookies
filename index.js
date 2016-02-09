@@ -7,7 +7,7 @@ var RNCookieManagerAndroid = NativeModules.RNCookieManagerAndroid;
 
 var CookieManager;
 if (Platform.OS === 'ios') {
-    invariant(RNCookieManagerIOS, 
+    invariant(RNCookieManagerIOS,
             'Add RNCookieMangerIOS.h and RNCookieManagerIOS.m to your Xcode project');
     CookieManager = RNCookieManagerIOS;
 } else if (Platform.OS === 'android') {
@@ -17,14 +17,15 @@ if (Platform.OS === 'ios') {
     invariant(CookieManager, "Invalid platform");
 }
 
-functions = [
+var functions = [
     'set',
     'setFromResponse',
     'get',
     'getAll',
     'clearAll'
-]
+];
+
 module.exports = {}
-for(var i=0; i < functions.length; i++) {
+for (var i=0; i < functions.length; i++) {
     module.exports[functions[i]] = CookieManager[functions[i]];
 }
