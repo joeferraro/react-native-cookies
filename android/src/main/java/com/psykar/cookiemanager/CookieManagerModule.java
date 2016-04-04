@@ -6,6 +6,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -41,7 +43,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         headers.put("Set-cookie", Collections.singletonList(value));
         URI uri = new URI(url);
         this.cookieHandler.put(uri, headers);
-        callback.invoke(true);
+        callback.invoke(null, null);
     }
 
     @ReactMethod
@@ -56,15 +58,23 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         Map<String, List<String>> cookieMap = this.cookieHandler.get(uri, new HashMap());
         // If only the variables were public
         List<String> cookieList = cookieMap.get("Cookie");
+        WritableMap map = Arguments.createMap();
         if (cookieList != null) {
-            callback.invoke(cookieList.get(0));
-        } else {
-            callback.invoke(cookieList);
+            String[] cookies = cookieList.get(0).split(";");
+            for (int i = 0; i < cookies.length; i++) {
+                String[] cookie = cookies[i].split("=");
+                map.putString(cookie[0], cookie[1]);
+            }
         }
+        callback.invoke(null, map);
     }
 
     @ReactMethod
     public void clearAll(final Callback callback) {
-        this.cookieHandler.clearCookies(callback);
+        this.cookieHandler.clearCookies(new Callback() {
+            public void invoke(Object... args) {
+                callback.invoke(null, null);
+            }
+        });
     }
 }

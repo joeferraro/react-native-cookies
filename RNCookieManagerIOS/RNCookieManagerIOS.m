@@ -29,24 +29,22 @@ RCT_EXPORT_METHOD(set:(NSDictionary *)props callback:(RCTResponseSenderBlock)cal
     NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
     [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
 
-    callback(@[[NSNull null], @"success"]);
+    callback(@[[NSNull null]]);
 }
 
 RCT_EXPORT_METHOD(setFromResponse:(NSURL *)url value:(NSDictionary *)value callback:(RCTResponseSenderBlock)callback) {
   NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:value forURL:url];
   [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:url mainDocumentURL:NULL];
-    callback(@[[NSNull null], @"success"]);
+    callback(@[[NSNull null]]);
 }
 
 
 RCT_EXPORT_METHOD(get:(NSURL *)url callback:(RCTResponseSenderBlock)callback) {
-  NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:url];
-    NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
-    if ([headers objectForKey:@"Cookie"] == nil) {
-        callback(@[[NSNull null], @"success"]);
-    } else {
-        callback(@[headers[@"Cookie"], @"success"]);
+    NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
+    for (NSHTTPCookie *c in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:url]) {
+        [cookies setObject:c.value forKey:c.name];
     }
+    callback(@[[NSNull null], cookies]);
 }
 
 RCT_EXPORT_METHOD(clearAll:(RCTResponseSenderBlock)callback) {
@@ -54,7 +52,7 @@ RCT_EXPORT_METHOD(clearAll:(RCTResponseSenderBlock)callback) {
     for (NSHTTPCookie *c in cookieStorage.cookies) {
         [cookieStorage deleteCookie:c];
     }
-    callback(@[[NSNull null], @"success"]);
+    callback(@[[NSNull null]]);
 }
 
 // TODO: return a better formatted list of cookies per domain
@@ -69,7 +67,7 @@ RCT_EXPORT_METHOD(getAll:(RCTResponseSenderBlock)callback) {
         [d setObject:c.path forKey:@"path"];
         [cookies setObject:d forKey:c.name];
     }
-    callback(@[cookies, @"success"]);
+    callback(@[[NSNull null], cookies]);
 }
 
 @end
