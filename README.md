@@ -45,7 +45,7 @@ CookieManager.setFromResponse('http://example.com', 'user_session=abcdefg; path=
 })
 
 // Get cookies as a request header string
-CookieManager.get('http://example.com', (res) => {
+CookieManager.get('http://example.com', (err, res) => {
   console.log('Got cookies for url', res);
   // Outputs 'user_session=abcdefg; path=/;'
 })
