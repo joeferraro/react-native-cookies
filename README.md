@@ -4,14 +4,6 @@ Cookie manager for react native.
 
 ### Installation
 
-#### IOS
-1. `npm install react-native-cookies`
-2. In the XCode's "Project navigator", right click on project name folder ➜ `Add Files to <...>`
- - Ensure `Copy items if needed` and `Create groups` are checked
-3. Go to `node_modules` ➜ `react-native-cookies` ➜ add `RNCookieManagerIOS` folder
-4. Compile and have some cookies
-
-#### android (only tested on react-native <= 0.18.1)
 1. `npm install react-native-cookies`
 2. `rnpm link react-native-cookies` - (run `npm install -g rnpm` if required)
 3. Om nom nom nom cookies.
