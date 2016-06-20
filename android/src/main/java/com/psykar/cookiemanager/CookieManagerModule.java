@@ -63,7 +63,9 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             String[] cookies = cookieList.get(0).split(";");
             for (int i = 0; i < cookies.length; i++) {
                 String[] cookie = cookies[i].split("=");
-                map.putString(cookie[0], cookie[1]);
+                if(cookie.length > 1) {
+                  map.putString(cookie[0].trim(), cookie[1]);
+                }
             }
         }
         callback.invoke(null, map);
