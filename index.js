@@ -1,6 +1,5 @@
-var React = require('react-native');
-var NativeModules = React.NativeModules;
-var Platform = React.Platform;
+import React from 'react';
+import {NativeModules, Platform} from 'react-native';
 var invariant = require('invariant');
 var RNCookieManagerIOS = NativeModules.RNCookieManagerIOS;
 var RNCookieManagerAndroid = NativeModules.RNCookieManagerAndroid;
