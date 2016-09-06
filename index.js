@@ -21,7 +21,8 @@ var functions = [
     'setFromResponse',
     'get',
     'getAll',
-    'clearAll'
+    'clearAll',
+    'clearByName'
 ];
 
 module.exports = {}
