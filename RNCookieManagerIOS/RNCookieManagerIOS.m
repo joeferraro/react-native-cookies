@@ -1,5 +1,9 @@
 #import "RNCookieManagerIOS.h"
+#if __has_include("RCTConvert.h")
 #import "RCTConvert.h"
+#else
+#import <React/RCTConvert.h>
+#endif
 
 @implementation RNCookieManagerIOS
 
