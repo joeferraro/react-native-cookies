@@ -1,6 +1,6 @@
 {
   "name": "react-native-cookies",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Cookie manager for react native",
   "keywords": [ "react", "react native", "react-component", "cookies", "webview", "react-native" ],
   "main": "index.js",
