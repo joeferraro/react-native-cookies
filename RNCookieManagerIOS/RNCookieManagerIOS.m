@@ -78,8 +78,7 @@ RCT_EXPORT_METHOD(get:(NSURL *) url
     resolve(cookies);
 }
 
-RCT_EXPORT_METHOD(clearAll:
-    resolver:(RCTPromiseResolveBlock)resolve
+RCT_EXPORT_METHOD(clearAll:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     for (NSHTTPCookie *c in cookieStorage.cookies) {
@@ -101,8 +100,7 @@ RCT_EXPORT_METHOD(clearByName:(NSString *) name
 }
 
 // TODO: return a better formatted list of cookies per domain
-RCT_EXPORT_METHOD(getAll:
-    resolver:(RCTPromiseResolveBlock)resolve
+RCT_EXPORT_METHOD(getAll:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
