@@ -47,6 +47,11 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getFromResponse(String url, Callback callback) throws URISyntaxException, IOException {
+        get(url, callback);
+    }
+
+    @ReactMethod
     public void getAll(Callback callback) throws Exception {
         throw new Exception("Cannot get all cookies on android, try getCookieHeader(url)");
     }

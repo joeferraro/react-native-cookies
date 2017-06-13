@@ -42,6 +42,24 @@ RCT_EXPORT_METHOD(setFromResponse:(NSURL *)url value:(NSDictionary *)value callb
     callback(@[[NSNull null]]);
 }
 
+RCT_EXPORT_METHOD(getFromResponse:(NSURL *)url callback:(RCTResponseSenderBlock)callback) {
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [NSURLConnection sendAsynchronousRequest:request  queue:[[NSOperationQueue alloc] init]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:httpResponse.allHeaderFields forURL:response.URL];
+        NSMutableDictionary *dics = [NSMutableDictionary dictionary];
+
+        for (int i = 0; i < cookies.count; i++) {
+            NSHTTPCookie *cookie = [cookies objectAtIndex:i];
+            [dics setObject:cookie.value forKey:cookie.name];
+            NSLog(@"cookie: name=%@, value=%@", cookie.name, cookie.value);
+            [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+        }
+        callback(@[[NSNull null], dics]);
+    }];
+}
 
 RCT_EXPORT_METHOD(get:(NSURL *)url callback:(RCTResponseSenderBlock)callback) {
     NSMutableDictionary *cookies = [NSMutableDictionary dictionary];

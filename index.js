@@ -19,6 +19,7 @@ if (Platform.OS === 'ios') {
 var functions = [
     'set',
     'setFromResponse',
+    'getFromResponse',
     'get',
     'getAll',
     'clearAll',
