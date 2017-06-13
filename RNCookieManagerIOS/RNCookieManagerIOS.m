@@ -9,7 +9,7 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(set,
+RCT_REMAP_METHOD(set,
     props:(NSDictionary *)props,
     resolver:(RCTPromiseResolveBlock)resolve,
     rejecter:(RCTPromiseRejectBlock)reject) {
@@ -39,7 +39,7 @@ RCT_EXPORT_METHOD(set,
     resolve();
 }
 
-RCT_EXPORT_METHOD(setFromResponse,
+RCT_REMAP_METHOD(setFromResponse,
     url:(NSURL *)url,
     value:(NSDictionary *)value,
     resolver:(RCTPromiseResolveBlock)resolve,
@@ -49,7 +49,7 @@ RCT_EXPORT_METHOD(setFromResponse,
     resolve();
 }
 
-RCT_EXPORT_METHOD(getFromResponse,
+RCT_REMAP_METHOD(getFromResponse,
     url:(NSURL *)url,
     resolver:(RCTPromiseResolveBlock)resolve,
     rejecter:(RCTPromiseRejectBlock)reject) {
@@ -71,7 +71,7 @@ RCT_EXPORT_METHOD(getFromResponse,
     }];
 }
 
-RCT_EXPORT_METHOD(get,
+RCT_REMAP_METHOD(get,
     url:(NSURL *) url,
     resolver:(RCTPromiseResolveBlock)resolve,
     rejecter:(RCTPromiseRejectBlock)reject) {
@@ -82,7 +82,7 @@ RCT_EXPORT_METHOD(get,
     resolve(cookies);
 }
 
-RCT_EXPORT_METHOD(clearAll,
+RCT_REMAP_METHOD(clearAll,
     resolver:(RCTPromiseResolveBlock)resolve,
     rejecter:(RCTPromiseRejectBlock)reject) {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
@@ -92,7 +92,7 @@ RCT_EXPORT_METHOD(clearAll,
     resolve();
 }
 
-RCT_EXPORT_METHOD(clearByName,
+RCT_REMAP_METHOD(clearByName,
     name:(NSString *) name,
     resolver:(RCTPromiseResolveBlock)resolve,
     rejecter:(RCTPromiseRejectBlock)reject) {
@@ -106,7 +106,7 @@ RCT_EXPORT_METHOD(clearByName,
 }
 
 // TODO: return a better formatted list of cookies per domain
-RCT_EXPORT_METHOD(getAll,
+RCT_REMAP_METHOD(getAll,
     resolver:(RCTPromiseResolveBlock)resolve,
     rejecter:(RCTPromiseRejectBlock)reject) {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
