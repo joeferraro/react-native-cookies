@@ -8,6 +8,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Promise;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -32,32 +33,32 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void set(ReadableMap cookie, final Callback callback) throws Exception {
+    public void set(ReadableMap cookie, final Promise promise) throws Exception {
         throw new Exception("Cannot call on android, try setFromResponse");
     }
 
     @ReactMethod
-    public void setFromResponse(String url, String value, final Callback callback) throws URISyntaxException, IOException {
+    public void setFromResponse(String url, String value, final Promise promise) throws URISyntaxException, IOException {
         Map headers = new HashMap<String, List<String>>();
         // Pretend this is a header
         headers.put("Set-cookie", Collections.singletonList(value));
         URI uri = new URI(url);
         this.cookieHandler.put(uri, headers);
-        callback.invoke(null, null);
+        promise.resolve(null);
     }
 
     @ReactMethod
-    public void getFromResponse(String url, Callback callback) throws URISyntaxException, IOException {
-        get(url, callback);
+    public void getFromResponse(String url, Promise promise) throws URISyntaxException, IOException {
+        promise.resolve(url, promise)
     }
 
     @ReactMethod
-    public void getAll(Callback callback) throws Exception {
+    public void getAll(Promise promise) throws Exception {
         throw new Exception("Cannot get all cookies on android, try getCookieHeader(url)");
     }
 
     @ReactMethod
-    public void get(String url, Callback callback) throws URISyntaxException, IOException {
+    public void get(String url, Promise promise) throws URISyntaxException, IOException {
         URI uri = new URI(url);
 
         Map<String, List<String>> cookieMap = this.cookieHandler.get(uri, new HashMap());
@@ -73,14 +74,14 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 }
             }
         }
-        callback.invoke(null, map);
+        promise.resolve(map);
     }
 
     @ReactMethod
-    public void clearAll(final Callback callback) {
+    public void clearAll(final Promise promise) {
         this.cookieHandler.clearCookies(new Callback() {
             public void invoke(Object... args) {
-                callback.invoke(null, null);
+                promise.resolve(null);
             }
         });
     }

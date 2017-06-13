@@ -9,7 +9,10 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(set:(NSDictionary *)props callback:(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(set,
+    props:(NSDictionary *)props,
+    resolver:(RCTPromiseResolveBlock)resolve,
+    rejecter:(RCTPromiseRejectBlock)reject) {
     NSString *name = [RCTConvert NSString:props[@"name"]];
     NSString *value = [RCTConvert NSString:props[@"value"]];
     NSString *domain = [RCTConvert NSString:props[@"domain"]];
@@ -33,16 +36,23 @@ RCT_EXPORT_METHOD(set:(NSDictionary *)props callback:(RCTResponseSenderBlock)cal
     NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
     [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
 
-    callback(@[[NSNull null]]);
+    resolve();
 }
 
-RCT_EXPORT_METHOD(setFromResponse:(NSURL *)url value:(NSDictionary *)value callback:(RCTResponseSenderBlock)callback) {
-  NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:value forURL:url];
-  [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:url mainDocumentURL:NULL];
-    callback(@[[NSNull null]]);
+RCT_EXPORT_METHOD(setFromResponse,
+    url:(NSURL *)url,
+    value:(NSDictionary *)value,
+    resolver:(RCTPromiseResolveBlock)resolve,
+    rejecter:(RCTPromiseRejectBlock)reject) {
+    NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:value forURL:url];
+    [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:url mainDocumentURL:NULL];
+    resolve();
 }
 
-RCT_EXPORT_METHOD(getFromResponse:(NSURL *)url callback:(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(getFromResponse,
+    url:(NSURL *)url,
+    resolver:(RCTPromiseResolveBlock)resolve,
+    rejecter:(RCTPromiseRejectBlock)reject) {
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [NSURLConnection sendAsynchronousRequest:request  queue:[[NSOperationQueue alloc] init]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -57,38 +67,48 @@ RCT_EXPORT_METHOD(getFromResponse:(NSURL *)url callback:(RCTResponseSenderBlock)
             NSLog(@"cookie: name=%@, value=%@", cookie.name, cookie.value);
             [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
         }
-        callback(@[[NSNull null], dics]);
+        resolve(dics);
     }];
 }
 
-RCT_EXPORT_METHOD(get:(NSURL *)url callback:(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(get,
+    url:(NSURL *) url,
+    resolver:(RCTPromiseResolveBlock)resolve,
+    rejecter:(RCTPromiseRejectBlock)reject) {
     NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
     for (NSHTTPCookie *c in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:url]) {
         [cookies setObject:c.value forKey:c.name];
     }
-    callback(@[[NSNull null], cookies]);
+    resolve(cookies);
 }
 
-RCT_EXPORT_METHOD(clearAll:(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(clearAll,
+    resolver:(RCTPromiseResolveBlock)resolve,
+    rejecter:(RCTPromiseRejectBlock)reject) {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     for (NSHTTPCookie *c in cookieStorage.cookies) {
         [cookieStorage deleteCookie:c];
     }
-    callback(@[[NSNull null]]);
+    resolve();
 }
 
-RCT_EXPORT_METHOD(clearByName:(NSString *)name callback:(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(clearByName,
+    name:(NSString *) name,
+    resolver:(RCTPromiseResolveBlock)resolve,
+    rejecter:(RCTPromiseRejectBlock)reject) {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     for (NSHTTPCookie *c in cookieStorage.cookies) {
       if ([[c name] isEqualToString:name]) {
         [cookieStorage deleteCookie:c];
       }
     }
-    callback(@[[NSNull null]]);
+    resolve();
 }
 
 // TODO: return a better formatted list of cookies per domain
-RCT_EXPORT_METHOD(getAll:(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(getAll,
+    resolver:(RCTPromiseResolveBlock)resolve,
+    rejecter:(RCTPromiseRejectBlock)reject) {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
     for (NSHTTPCookie *c in cookieStorage.cookies) {
@@ -99,7 +119,7 @@ RCT_EXPORT_METHOD(getAll:(RCTResponseSenderBlock)callback) {
         [d setObject:c.path forKey:@"path"];
         [cookies setObject:d forKey:c.name];
     }
-    callback(@[[NSNull null], cookies]);
+    resolve(cookies);
 }
 
 @end
