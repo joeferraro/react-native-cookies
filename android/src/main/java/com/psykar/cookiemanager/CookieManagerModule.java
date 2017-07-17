@@ -49,7 +49,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getFromResponse(String url, Promise promise) throws URISyntaxException, IOException {
-        promise.resolve(url, promise)
+        promise.resolve(url, promise);
     }
 
     @ReactMethod
