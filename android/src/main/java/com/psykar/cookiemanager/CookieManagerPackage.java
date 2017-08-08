@@ -24,7 +24,7 @@ public class CookieManagerPackage implements ReactPackage {
         return modules;
     }
 
-    @Override
+    // Deprecated
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }
