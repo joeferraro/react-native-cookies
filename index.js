@@ -8,7 +8,7 @@ let CookieManager;
 
 if (Platform.OS === 'ios') {
     invariant(RNCookieManagerIOS,
-        'react-native-cookies: Add RNCookieMangerIOS.h and RNCookieManagerIOS.m to your Xcode project');
+        'react-native-cookies: Add RNCookieManagerIOS.h and RNCookieManagerIOS.m to your Xcode project');
     CookieManager = RNCookieManagerIOS;
 } else if (Platform.OS === 'android') {
     invariant(RNCookieManagerAndroid,
