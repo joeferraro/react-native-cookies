@@ -115,19 +115,19 @@ CookieManager.get('http://example.com')
 
 // list cookies (IOS ONLY)
 CookieManager.getAll()
-  .then(res) => {
+  .then((res) => {
     console.log('CookieManager.getAll =>', res);
   });
 
 // clear cookies
 CookieManager.clearAll()
-  .then(res) => {
+  .then((res) => {
     console.log('CookieManager.clearAll =>', res);
   });
 
 // clear a specific cookie by its name (IOS ONLY)
 CookieManager.clearByName('cookie_name')
-  .then(res) => {
+  .then((res) => {
     console.log('CookieManager.clearByName =>', res);
   });
 
