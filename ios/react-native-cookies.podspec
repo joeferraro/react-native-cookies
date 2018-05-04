@@ -28,4 +28,5 @@ Pod::Spec.new do |s|
   s.preserve_paths      = "*.framework"
   s.source_files        = 'RNCookieManagerIOS/**/*.{h,m}'
 
+  s.dependency 'React'
 end
