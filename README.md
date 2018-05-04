@@ -6,13 +6,18 @@ Cookie manager for react native.
 [![npm downloads](https://img.shields.io/npm/dm/react-native-cookies.svg)](https://www.npmjs.com/package/react-native-cookies)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/joeferraro/react-native-cookies/master/LICENSE.md)
 
-
-
-
 ### Installation
+
+#### Yarn
 
 ```
 yarn add react-native-cookies
+```
+
+#### NPM
+
+```
+npm install react-native-cookies
 ```
 
 ### Linking
@@ -76,15 +81,13 @@ protected List<ReactPackage> getPackages() {
 }
 ```
 
-
-
 ### Usage
 
 ```javascript
 import CookieManager from 'react-native-cookies';
 
 // set a cookie (IOS ONLY)
-CookieManager.set({
+const res = await CookieManager.set({
   name: 'myCookie',
   value: 'myValue',
   domain: 'some domain',
@@ -92,23 +95,17 @@ CookieManager.set({
   path: '/',
   version: '1',
   expiration: '2015-05-30T12:30:00.00-05:00'
-}).then((res) => {
-  console.log('CookieManager.set =>', res);
 });
 
-// Set cookies from a response header
+// Set cookies from a response header, result is boolean
 // This allows you to put the full string provided by a server's Set-Cookie 
 // response header directly into the cookie store.
-CookieManager.setFromResponse(
+const res = CookieManager.setFromResponse(
   'http://example.com', 
-  'user_session=abcdefg; path=/; expires=Thu, 1 Jan 2030 00:00:00 -0000; secure; HttpOnly')
-    .then((res) => {
-      // `res` will be true or false depending on success.
-      console.log('CookieManager.setFromResponse =>', res);
-    });
+  'user_session=abcdefg; path=/; expires=Thu, 1 Jan 2030 00:00:00 -0000; secure; HttpOnly');
 
 // Get cookies as a request header string
-CookieManager.get('http://example.com')
+const cookies = CookieManager.get('http://example.com')
   .then((res) => {
     console.log('CookieManager.get =>', res); // => 'user_session=abcdefg; path=/;'
   });
