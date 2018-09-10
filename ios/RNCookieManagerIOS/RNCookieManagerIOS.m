@@ -5,13 +5,18 @@
 #import <React/RCTConvert.h>
 #endif
 
+static NSString * const NOT_AVAILABLE_ERROR_MESSAGE = @"WebKit/WebKit-Components are only available with iOS11 and higher!";
+
 @implementation RNCookieManagerIOS
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(set:(NSDictionary *)props
+RCT_EXPORT_METHOD(
+    set:(NSDictionary *)props
+    useWebKit:(BOOL)useWebKit
     resolver:(RCTPromiseResolveBlock)resolve
-    rejecter:(RCTPromiseRejectBlock)reject) {
+    rejecter:(RCTPromiseRejectBlock)reject)
+{
     NSString *name = [RCTConvert NSString:props[@"name"]];
     NSString *value = [RCTConvert NSString:props[@"value"]];
     NSString *domain = [RCTConvert NSString:props[@"domain"]];
@@ -29,13 +34,25 @@ RCT_EXPORT_METHOD(set:(NSDictionary *)props
     [cookieProperties setObject:version forKey:NSHTTPCookieVersion];
     [cookieProperties setObject:expiration forKey:NSHTTPCookieExpires];
 
-    NSLog(@"SETTING COOKIE");
-    NSLog(@"%@", cookieProperties);
-
     NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
-    [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
 
-    resolve(nil);
+    NSLog(@"SETTING COOKIE");
+    NSLog(@"%@", cookie);
+
+    if (useWebKit) {
+        if (@available(iOS 11.0, *)) {
+            dispatch_async(dispatch_get_main_queue(), ^(){
+                WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
+                [cookieStore setCookie:cookie completionHandler:nil];
+                resolve(nil);
+            });
+        } else {
+            reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
+        }
+    } else {
+        [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+        resolve(nil);
+    }
 }
 
 RCT_EXPORT_METHOD(setFromResponse:(NSURL *)url
@@ -68,23 +85,94 @@ RCT_EXPORT_METHOD(getFromResponse:(NSURL *)url
     }];
 }
 
-RCT_EXPORT_METHOD(get:(NSURL *) url
-    resolver:(RCTPromiseResolveBlock)resolve
-    rejecter:(RCTPromiseRejectBlock)reject) {
-    NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
-    for (NSHTTPCookie *c in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:url]) {
-        [cookies setObject:c.value forKey:c.name];
+-(NSString *)getDomainName:(NSURL *) url
+{
+    NSString *separator = @".";
+    NSInteger maxLength = 2;
+
+    NSURLComponents *components = [[NSURLComponents alloc]initWithURL:url resolvingAgainstBaseURL:FALSE];
+    NSArray<NSString *> *separatedHost = [components.host componentsSeparatedByString:separator];
+    NSInteger count = [separatedHost count];
+    NSInteger endPosition = count;
+    NSInteger startPosition = count - maxLength;
+
+    NSMutableString *result = [[NSMutableString alloc]init];
+    for (NSUInteger i = startPosition; i != endPosition; i++) {
+        [result appendString:separator];
+        [result appendString:[separatedHost objectAtIndex:i]];
     }
-    resolve(cookies);
+    return result;
 }
 
-RCT_EXPORT_METHOD(clearAll:(RCTPromiseResolveBlock)resolve
-    rejecter:(RCTPromiseRejectBlock)reject) {
-    NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    for (NSHTTPCookie *c in cookieStorage.cookies) {
-        [cookieStorage deleteCookie:c];
+RCT_EXPORT_METHOD(
+    get:(NSURL *) url
+    useWebKit:(BOOL)useWebKit
+    resolver:(RCTPromiseResolveBlock)resolve
+    rejecter:(RCTPromiseRejectBlock)reject)
+{
+    if (useWebKit) {
+        if (@available(iOS 11.0, *)) {
+            dispatch_async(dispatch_get_main_queue(), ^(){
+                NSString *topLevelDomain = [self getDomainName:url];
+
+                WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
+                [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
+                    NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
+                    for(NSHTTPCookie *currentCookie in allCookies) {
+                        if([currentCookie.domain containsString:topLevelDomain]) {
+                            [cookies setObject:currentCookie.value forKey:currentCookie.name];
+                        }
+                    }
+                    resolve(cookies);
+                }];
+            });
+        } else {
+            reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
+        }
+    } else {
+        NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
+        for (NSHTTPCookie *c in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:url]) {
+            [cookies setObject:c.value forKey:c.name];
+        }
+        resolve(cookies);
     }
-    resolve(nil);
+}
+
+RCT_EXPORT_METHOD(
+    clearAll:(BOOL)useWebKit
+    resolver:(RCTPromiseResolveBlock)resolve
+    rejecter:(RCTPromiseRejectBlock)reject)
+{
+    if (useWebKit) {
+        if (@available(iOS 11.0, *)) {
+            dispatch_async(dispatch_get_main_queue(), ^(){
+                WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
+                [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
+                    for(NSHTTPCookie *currentCookie in allCookies) {
+                        // Uses the NSHTTPCookie directly has no effect, nor deleted the cookie nor thrown an error.
+                        // Create a new cookie with the given values and delete this one do the work.
+                        NSMutableDictionary<NSHTTPCookiePropertyKey, id> *cookieData =  [NSMutableDictionary dictionary];
+                        [cookieData setValue:currentCookie.name forKey:NSHTTPCookieName];
+                        [cookieData setValue:currentCookie.value forKey:NSHTTPCookieValue];
+                        [cookieData setValue:currentCookie.domain forKey:NSHTTPCookieDomain];
+                        [cookieData setValue:currentCookie.path forKey:NSHTTPCookiePath];
+
+                        NSHTTPCookie *newCookie = [NSHTTPCookie cookieWithProperties:cookieData];
+                        [cookieStore deleteCookie:newCookie completionHandler:^{}];
+                    }
+                    resolve(nil);
+                }];
+            });
+        } else {
+            reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
+        }
+    } else {
+        NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+        for (NSHTTPCookie *c in cookieStorage.cookies) {
+            [cookieStorage deleteCookie:c];
+        }
+        resolve(nil);
+    }
 }
 
 RCT_EXPORT_METHOD(clearByName:(NSString *) name
@@ -99,20 +187,47 @@ RCT_EXPORT_METHOD(clearByName:(NSString *) name
     resolve(nil);
 }
 
-// TODO: return a better formatted list of cookies per domain
-RCT_EXPORT_METHOD(getAll:(RCTPromiseResolveBlock)resolve
-    rejecter:(RCTPromiseRejectBlock)reject) {
-    NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
-    for (NSHTTPCookie *c in cookieStorage.cookies) {
-        NSMutableDictionary *d = [NSMutableDictionary dictionary];
-        [d setObject:c.value forKey:@"value"];
-        [d setObject:c.name forKey:@"name"];
-        [d setObject:c.domain forKey:@"domain"];
-        [d setObject:c.path forKey:@"path"];
-        [cookies setObject:d forKey:c.name];
+RCT_EXPORT_METHOD(
+    getAll:(BOOL)useWebKit
+    resolver:(RCTPromiseResolveBlock)resolve
+    rejecter:(RCTPromiseRejectBlock)reject)
+{
+    if (useWebKit) {
+        if (@available(iOS 11.0, *)) {
+            dispatch_async(dispatch_get_main_queue(), ^(){
+                WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
+                [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
+                    resolve([self createCookieList: allCookies]);
+                }];
+            });
+        } else {
+            reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
+        }
+    } else {
+        NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+        resolve([self createCookieList:cookieStorage.cookies]);
     }
-    resolve(cookies);
+}
+
+// TODO: return a better formatted list of cookies per domain
+-(NSDictionary *)createCookieList:(NSArray<NSHTTPCookie *>*)cookies
+{
+    NSMutableDictionary *cookieList = [NSMutableDictionary dictionary];
+    for (NSHTTPCookie *cookie in cookies) {
+        // NSLog(@"COOKIE: %@", cookie);
+        [cookieList setObject:[self createCookieData:cookie] forKey:cookie.name];
+    }
+    return cookieList;
+}
+
+-(NSDictionary *)createCookieData:(NSHTTPCookie *)cookie
+{
+    NSMutableDictionary *cookieData = [NSMutableDictionary dictionary];
+    [cookieData setObject:cookie.value forKey:@"value"];
+    [cookieData setObject:cookie.name forKey:@"name"];
+    [cookieData setObject:cookie.domain forKey:@"domain"];
+    [cookieData setObject:cookie.path forKey:@"path"];
+    return cookieData;
 }
 
 @end

@@ -5,6 +5,8 @@
 #import <React/RCTBridgeModule.h>
 #endif
 
+#import <WebKit/WebKit.h>
+
 @interface RNCookieManagerIOS : NSObject <RCTBridgeModule>
 
 @end

@@ -19,16 +19,18 @@ if (Platform.OS === 'ios') {
 }
 
 const functions = [
-    'set',
     'setFromResponse',
     'getFromResponse',
-    'get',
-    'getAll',
-    'clearAll',
     'clearByName'
 ];
 
-module.exports = {}
+module.exports = {
+  getAll: (useWebKit = false) => CookieManager.getAll(useWebKit),
+  clearAll: (useWebKit = false) => CookieManager.clearAll(useWebKit),
+  get: (url, useWebKit = false) => CookieManager.get(url, useWebKit),
+  set: (cookie, useWebKit = false) => CookieManager.set(cookie, useWebKit),
+};
+
 for (var i = 0; i < functions.length; i++) {
     module.exports[functions[i]] = CookieManager[functions[i]];
 }
