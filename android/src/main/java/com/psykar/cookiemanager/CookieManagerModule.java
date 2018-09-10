@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     private ForwardingCookieHandler cookieHandler;
@@ -43,8 +42,12 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         // Pretend this is a header
         headers.put("Set-Cookie", Collections.singletonList(value));
         URI uri = new URI(url);
-        this.cookieHandler.put(uri, headers);
-        promise.resolve(null);
+        try {
+            this.cookieHandler.put(uri, headers);
+            promise.resolve(true);
+        } catch (IOException e) {
+            promise.resolve(false);
+        }
     }
 
     @ReactMethod
@@ -69,7 +72,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             String[] cookies = cookieList.get(0).split(";");
             for (int i = 0; i < cookies.length; i++) {
                 String[] cookie = cookies[i].split("=", 2);
-                if(cookie.length > 1) {
+                if (cookie.length > 1) {
                   map.putString(cookie[0].trim(), cookie[1]);
                 }
             }
