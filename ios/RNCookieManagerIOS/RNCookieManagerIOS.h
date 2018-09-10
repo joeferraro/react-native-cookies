@@ -9,4 +9,6 @@
 
 @interface RNCookieManagerIOS : NSObject <RCTBridgeModule>
 
+@property (nonatomic, strong) NSDateFormatter *formatter;
+
 @end
