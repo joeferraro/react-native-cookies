@@ -41,7 +41,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     public void setFromResponse(String url, String value, final Promise promise) throws URISyntaxException, IOException {
         Map headers = new HashMap<String, List<String>>();
         // Pretend this is a header
-        headers.put("Set-cookie", Collections.singletonList(value));
+        headers.put("Set-Cookie", Collections.singletonList(value));
         URI uri = new URI(url);
         this.cookieHandler.put(uri, headers);
         promise.resolve(null);

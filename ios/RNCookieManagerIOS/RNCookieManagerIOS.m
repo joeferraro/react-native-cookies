@@ -56,10 +56,10 @@ RCT_EXPORT_METHOD(
 }
 
 RCT_EXPORT_METHOD(setFromResponse:(NSURL *)url
-    value:(NSDictionary *)value
+    value:(NSString *)value
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
-    NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:value forURL:url];
+    NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:@{@"Set-Cookie": value} forURL:url];
     [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:url mainDocumentURL:NULL];
     resolve(nil);
 }
